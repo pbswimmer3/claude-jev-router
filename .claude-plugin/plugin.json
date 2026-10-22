@@ -1,0 +1,32 @@
+{
+  "name": "jev-router",
+  "version": "0.3.0",
+  "description": "Suggests a Claude model and effort level for the message you are about to send, scored by the Jev decision model.",
+  "author": {
+    "name": "Prad Biswas"
+  },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "jevEndpoint": {
+      "type": "string",
+      "title": "Jev endpoint",
+      "description": "Full URL of a Jev-shaped decisions API. Merge Gateway by default; TypeSafe direct is https://api.typesafe.ai/v1/systemone, local Kev is http://127.0.0.1:8009/v1/systemone.",
+      "default": "https://api-gateway.merge.dev/v1/decisions"
+    },
+    "jevModel": {
+      "type": "string",
+      "title": "Jev model",
+      "description": "Model id at that endpoint. Pinned, since the bars are tuned per version.",
+      "default": "typesafe/jev-1.13"
+    },
+    "keyFile": {
+      "type": "string",
+      "title": "Key file",
+      "description": "A .env file holding JEV_API_KEY or MERGE_GATEWAY_KEY, read when neither is in the environment.",
+      "default": "~/.config/jev-router/.env"
+    }
+  },
+  "homepage": "https://github.com/pbswimmer3/claude-jev-router",
+  "repository": "https://github.com/pbswimmer3/claude-jev-router",
+  "license": "Apache-2.0"
+}

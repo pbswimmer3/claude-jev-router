@@ -1,0 +1,6 @@
+claude-jev-router
+Copyright 2026 Prad Biswas
+
+The routing questions in hooks/rubric.ts and the confidence-bar/step-up policy in
+hooks/route.ts are adapted from jev-router by Engin Diri (github.com/dirien/jev-router),
+licensed under the Apache License, Version 2.0.
