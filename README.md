@@ -6,7 +6,7 @@ Type your message, press **Route with Jev**, and a card suggests the model and e
 
 ![The Route with Jev button above the prompt in the Claude desktop app](docs/desktop-button.png)
 
-![Suggestion cards for easy, medium, hard and continuation drafts, from real Jev answers](docs/cards.svg)
+![Suggestion cards for easy, medium, hard, hardest and continuation drafts, from real Jev answers](docs/cards.svg)
 
 ## Install
 
