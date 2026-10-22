@@ -65,23 +65,24 @@ Change the endpoint and model with `/plugin configure jev-router@claude-jev-rout
 
 ## How well it works
 
-It was tuned against three prompt sets. Every number holds in both option orders, since Jev 1.13 leans slightly toward whichever option comes first:
+It was tuned on sets A–C and then checked on a fresh held-out set D. Numbers for A–C hold in both option orders, since Jev 1.13 leans slightly toward whichever option comes first:
 
 | Set | What it is | Model exact | Effort exact |
 |---|---|---|---|
 | A | 58 public prompts from [dirien/jev-router](https://github.com/dirien/jev-router) | 91–97% | – |
 | B | 120 real Claude Code prompts, labeled from their outcomes | 64–68% | 49–57% |
 | C | 160 graded prompts (easy/medium/hard, 40 with context), blind-labeled by two models | 84–86% | 83–89% |
+| D | 100 held-out prompts across coding, data, writing, research and strategy, never used for tuning | 84% | 87% |
 
 - **Greetings after a long thread:** 12 of 12 now land on Haiku. Before the context rule, 3 of 12 did.
 - **Continuations:** 12 of 14 inherit the work they continue.
-- **Under-routing:** the cases where it picks a model too weak for the job stay at or below 9% on every set.
+- **Under-routing:** the cases where it picks a model too weak for the job stay at or below 9% on every set, and 0% on the held-out set D, where every model pick was within one tier of the labels.
 - **Speed and cost:** 0.2–0.4 s for one call, 0.6–0.8 s when the second call fires, about $0.00006 per call through Merge Gateway.
 
 A local Kev-0.8B was also tested. It picks largely by option position, so reversing the option order flipped 53% of its picks, against 8% for Jev. It isn't recommended for routing.
 
 **Known weak spots:**
-- "Design a multi-agent workflow" asks tend to get Fable where Opus would do.
+- Design and strategy asks (a rate-limiter design, a pricing change, a threat model) often get Fable where Opus would do; that was half of set D's misses. Narrowing Fable's definition fixed those but dropped real Fable-level prompts to Opus (28/28 right became 4/28), so the rubric keeps the over-pick, which is the cheaper mistake.
 - "Check this vendor's API docs" asks tend to get Haiku where Sonnet is safer.
 - Haiku is rare, by design: the 95% bar is deliberately strict.
 
