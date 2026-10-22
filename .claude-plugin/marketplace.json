@@ -1,6 +1,9 @@
 {
   "name": "claude-jev-router",
-  "owner": { "name": "Prad Biswas" },
+  "owner": {
+    "name": "Prad Biswas"
+  },
+  "description": "jev-router: a Claude Code mod that suggests a model and effort level for your draft.",
   "plugins": [
     {
       "name": "jev-router",
