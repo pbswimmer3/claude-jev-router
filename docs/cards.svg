@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 470" width="880" height="470" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
-  <title>jev-router suggestion cards for an easy, a continuation and a stepped-up draft</title>
-  <rect width="880" height="470" rx="16" fill="#151515"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 612" width="880" height="612" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title>jev-router suggestion cards for an easy, a medium, a hard and a continuation draft (real Jev answers)</title>
+  <rect width="880" height="612" rx="16" fill="#151515"/>
 
   <!-- Easy -->
   <text x="32" y="44" fill="#8a8a8a" font-size="13" letter-spacing="1">EASY · draft: "hi" (after a long thread)</text>
@@ -12,17 +12,17 @@
   <rect x="424" y="108" width="18" height="18" rx="4" fill="none" stroke="#5a5a5a"/>
   <text x="429" y="122" fill="#8a8a8a" font-size="11">D</text>
 
-  <!-- Continuation -->
-  <text x="32" y="186" fill="#8a8a8a" font-size="13" letter-spacing="1">CONTINUATION · draft: "yes do it" (after a migration plan)</text>
+  <!-- Medium -->
+  <text x="32" y="186" fill="#8a8a8a" font-size="13" letter-spacing="1">MEDIUM · draft: "write a python script that converts the partner csv export into notion markdown"</text>
   <rect x="32" y="198" width="816" height="84" rx="12" fill="#232323"/>
-  <text x="52" y="230" font-size="16"><tspan fill="#8a8a8a">Jev suggests </tspan><tspan fill="#f2f2f2" font-weight="600">Opus 5.5 · High effort</tspan><tspan fill="#8a8a8a">   model 97%, effort 88%</tspan></text>
+  <text x="52" y="230" font-size="16"><tspan fill="#8a8a8a">Jev suggests </tspan><tspan fill="#f2f2f2" font-weight="600">Sonnet 5.5 · Medium effort</tspan><tspan fill="#8a8a8a">   model 99%, effort 79%</tspan></text>
   <text x="52" y="264" fill="#8a8a8a" font-size="14">Set it in the model picker before you send.</text>
   <rect x="352" y="246" width="96" height="26" rx="6" fill="#2e2e2e" stroke="#3d3d3d"/>
   <text x="364" y="264" fill="#d6d6d6" font-size="14">Dismiss</text>
   <rect x="424" y="250" width="18" height="18" rx="4" fill="none" stroke="#5a5a5a"/>
   <text x="429" y="264" fill="#8a8a8a" font-size="11">D</text>
 
-  <!-- Stepped up / guard -->
+  <!-- Hard -->
   <text x="32" y="328" fill="#8a8a8a" font-size="13" letter-spacing="1">HARD · draft: "rotate the prod webhook secret and redeploy"</text>
   <rect x="32" y="340" width="816" height="104" rx="12" fill="#232323"/>
   <text x="52" y="372" font-size="16"><tspan fill="#8a8a8a">Jev suggests </tspan><tspan fill="#f2f2f2" font-weight="600">Opus 5.5 · High effort</tspan></text>
@@ -32,4 +32,14 @@
   <text x="364" y="426" fill="#d6d6d6" font-size="14">Dismiss</text>
   <rect x="424" y="412" width="18" height="18" rx="4" fill="none" stroke="#5a5a5a"/>
   <text x="429" y="426" fill="#8a8a8a" font-size="11">D</text>
+
+  <!-- Continuation -->
+  <text x="32" y="490" fill="#8a8a8a" font-size="13" letter-spacing="1">CONTINUATION · draft: "yes do it" (after a zero-downtime migration plan)</text>
+  <rect x="32" y="502" width="816" height="84" rx="12" fill="#232323"/>
+  <text x="52" y="534" font-size="16"><tspan fill="#8a8a8a">Jev suggests </tspan><tspan fill="#f2f2f2" font-weight="600">Fable 5.1 · Xhigh effort</tspan><tspan fill="#8a8a8a">   model 84%, effort 71% · touches production, credentials or billing</tspan></text>
+  <text x="52" y="568" fill="#8a8a8a" font-size="14">Set it in the model picker before you send.</text>
+  <rect x="352" y="550" width="96" height="26" rx="6" fill="#2e2e2e" stroke="#3d3d3d"/>
+  <text x="364" y="568" fill="#d6d6d6" font-size="14">Dismiss</text>
+  <rect x="424" y="554" width="18" height="18" rx="4" fill="none" stroke="#5a5a5a"/>
+  <text x="429" y="568" fill="#8a8a8a" font-size="11">D</text>
 </svg>
