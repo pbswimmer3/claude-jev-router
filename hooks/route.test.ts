@@ -77,6 +77,25 @@ describe('recommend', () => {
   })
 })
 
+describe('fable bar', () => {
+  const calm = { effort: { high: 0.9 }, risky: 0.1, namesOwn: 0 }
+
+  test('keeps a confident Fable pick', async () => {
+    expect(recommend({ ...calm, model: { fable: 0.95, opus: 0.05 } }, 'prove this queue is linearizable').model.value).toBe('fable')
+  })
+
+  test('drops an unsure Fable pick to Opus and says so', async () => {
+    const rec = recommend({ ...calm, model: { fable: 0.56, opus: 0.4 } }, 'plan our pricing change')
+    expect(rec.model.value).toBe('opus')
+    expect(rec.model.jev.value).toBe('fable')
+    expect(rec.reasons).toEqual(['Fable only when Jev is sure'])
+  })
+
+  test('still honours "use fable"', async () => {
+    expect(recommend({ ...calm, model: { fable: 0.56, opus: 0.4 }, namesOwn: 0.9 }, 'use fable for this plan').model.value).toBe('fable')
+  })
+})
+
 describe('namedEffort', () => {
   test('reads both spellings', async () => {
     expect(namedEffort('do it at high effort')).toBe('high')

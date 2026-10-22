@@ -30,6 +30,10 @@ export const EFFORT_BARS: Record<Effort, number> = { low: 0.5, medium: 0.3, high
 export const MODEL_CEILING: Tier = 'opus'
 export const EFFORT_CEILING: Effort = 'xhigh'
 export const RISKY_BAR = 0.7
+// Fable needs a direct pick Jev is sure of; below this it drops to Opus. Jev is usually
+// 0.9+ sure on real Fable work and 0.4-0.75 on design/strategy asks Opus handles (eval
+// 2026-10-23: held-out model exact 84% -> 87%, under-routing still 0%).
+export const FABLE_BAR = 0.7
 export const NAMES_OWN_BAR = 0.5
 // The conversation is attached only when the draft continues earlier work (GATE in rubric.ts).
 export const CONTEXT_BAR = 0.4
@@ -93,6 +97,12 @@ export function recommend(answers: JevAnswers, draft: string): Recommendation {
   const reasons: string[] = []
 
   if (model.isFallback) reasons.push('unsure, stepped up a model')
+
+  if (model.value === 'fable' && !model.isFallback && model.confidence < FABLE_BAR) {
+    model = { ...model, value: 'opus', confidence: answers.model.opus ?? 0, isFallback: true }
+    reasons.push('Fable only when Jev is sure')
+  }
+
   if (effort.isFallback) reasons.push('unsure, stepped up effort')
 
   if (answers.risky >= RISKY_BAR) {

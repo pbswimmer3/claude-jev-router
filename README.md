@@ -35,6 +35,7 @@ The card tells you when something other than Jev's own top pick decided the resu
 | Card says | Meaning |
 |---|---|
 | `model: Jev said Haiku 5.5 92% · unsure, stepped up a model` | Jev's top pick wasn't confident enough, so the mod moved up to the stronger of Jev's top two. |
+| `model: Jev said Fable 5.1 56% · Fable only when Jev is sure` | Jev picked Fable but wasn't at least 70% sure, so the card suggests Opus. |
 | `touches production, credentials or billing` | The draft changes something risky, so the pick is at least Opus at high effort. |
 | `you asked for opus; Jev would pick sonnet` | Your message said "use opus" (an instruction, not just a mention), so that wins. |
 
@@ -44,7 +45,7 @@ The card tells you when something other than Jev's own top pick decided the resu
 
 1. **One call on the draft alone.** Jev answers five questions in a single request: which model, which effort, whether the draft touches production/credentials/billing, whether it names its own model, and whether it continues earlier work.
 2. **Context only for continuations.** "yes do it", "try again" and "why did that fail?" only make sense against the earlier conversation, so they get a second call with your last two prompts and Claude's last reply attached. Greetings, thanks and standalone requests don't. Without this rule, a "hi" at the end of a long technical thread would inherit that thread's difficulty.
-3. **A policy turns probabilities into a pick.** Cheaper picks need more certainty: Haiku must clear 95% and Sonnet 85%. Below its bar, the mod takes the stronger of Jev's top two, but it never steps up into Fable or max effort; those only come from a direct pick. Then the production guard and your own instruction apply.
+3. **A policy turns probabilities into a pick.** Cheaper picks need more certainty: Haiku must clear 95% and Sonnet 85%. Below its bar, the mod takes the stronger of Jev's top two, but it never steps up into Fable or max effort; those only come from a direct pick, and Fable also needs Jev to be at least 70% sure (otherwise Opus). Then the production guard and your own instruction apply.
 
 Obvious secrets (API keys, tokens, `password=` values) are scrubbed before anything leaves your machine. Tool output and file contents are never sent.
 
@@ -69,10 +70,10 @@ It was tuned on sets A–C and then checked on a fresh held-out set D. Numbers f
 
 | Set | What it is | Model exact | Effort exact |
 |---|---|---|---|
-| A | 58 public prompts from [dirien/jev-router](https://github.com/dirien/jev-router) | 91–97% | – |
+| A | 58 public prompts from [dirien/jev-router](https://github.com/dirien/jev-router) | 90–95% | – |
 | B | 120 real Claude Code prompts, labeled from their outcomes | 64–68% | 49–57% |
-| C | 160 graded prompts (easy/medium/hard, 40 with context), blind-labeled by two models | 84–86% | 83–89% |
-| D | 100 held-out prompts across coding, data, writing, research and strategy, never used for tuning | 84% | 87% |
+| C | 160 graded prompts (easy/medium/hard, 40 with context), blind-labeled by two models | 88–89% | 83–89% |
+| D | 100 held-out prompts across coding, data, writing, research and strategy, never used for choosing settings | 87% | 87% |
 
 - **Greetings after a long thread:** 12 of 12 now land on Haiku. Before the context rule, 3 of 12 did.
 - **Continuations:** 12 of 14 inherit the work they continue.
@@ -82,7 +83,7 @@ It was tuned on sets A–C and then checked on a fresh held-out set D. Numbers f
 A local Kev-0.8B was also tested. It picks largely by option position, so reversing the option order flipped 53% of its picks, against 8% for Jev. It isn't recommended for routing.
 
 **Known weak spots:**
-- Design and strategy asks (a rate-limiter design, a pricing change, a threat model) often get Fable where Opus would do; that was half of set D's misses. Narrowing Fable's definition fixed those but dropped real Fable-level prompts to Opus (28/28 right became 4/28), so the rubric keeps the over-pick, which is the cheaper mistake.
+- Design and strategy asks (a rate-limiter design, a pricing change, a threat model) sometimes still get Fable where Opus would do, when Jev is very sure. A 70% Fable bar removes most of these (held-out set D went from 84% to 87%); rewording Fable's definition was tried and rejected, because real Fable-level prompts dropped to Opus.
 - "Check this vendor's API docs" asks tend to get Haiku where Sonnet is safer.
 - Haiku is rare, by design: the 95% bar is deliberately strict.
 
