@@ -128,3 +128,23 @@ export function recommend(answers: JevAnswers, draft: string): Recommendation {
 
   return { model, effort, reasons, namedModel: named }
 }
+
+// Who sends a prompt the person typed: the terminal, the phone bridge, or the desktop app (an SDK host,
+// which may also leave it unclassified). Notifications, peers, schedules and plugins are never routed.
+export const TYPED_ORIGINS: readonly string[] = ['composer', 'bridge', 'sdk', 'unclassified']
+
+// `origin` is absent where the engine stamped none: the person's own prompt.
+export type Sent = { text: string; origin?: string; isCommand: boolean; isMeta: boolean }
+export type Turn = { role: string; text: string; isToolResult: boolean }
+
+// A new session's first typed message, which nothing routed before it was sent.
+export function routesOnSend(sent: Sent, earlier: readonly Turn[], routedDraft?: string): boolean {
+  return (
+    sent.text.trim() !== '' &&
+    !sent.isCommand &&
+    !sent.isMeta &&
+    (sent.origin === undefined || TYPED_ORIGINS.includes(sent.origin)) &&
+    sent.text !== routedDraft &&
+    !earlier.some(t => t.role === 'user' && !t.isToolResult && t.text.trim() !== '')
+  )
+}

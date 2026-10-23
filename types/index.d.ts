@@ -20,7 +20,13 @@ export type Recommendation = {
 export type RouteStatus =
   | { kind: 'idle' }
   | { kind: 'routing' }
-  | { kind: 'ready'; rec: Recommendation; draft: string }
+  | {
+      kind: 'ready'
+      rec: Recommendation
+      draft: string
+      /** Set when the draft was a new session's first message, already sent: the model it is running on. */
+      sentOn?: string
+    }
   | { kind: 'error'; message: string }
 
 declare module 'claude-code' {

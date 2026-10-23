@@ -30,6 +30,10 @@ Then start a new session, or run `/reload-plugins` in an open one. The button ap
 2. Click **Route with Jev**, or focus the bar and press `R`.
 3. Read the card, then set that model and effort in the model picker and send. **Dismiss** (`D`) clears the card.
 
+### In a new session
+
+The desktop app's **New session** screen is the app's own launcher: no session has started yet, so no mod runs there and the button can't show. Instead the mod asks Jev about a new session's first message as you send it, and the card shows while that first turn runs. It names the model the message is running on, so you can switch in the picker for the next message, or stop and resend. Later messages go back to the button. A message you already routed with the button isn't asked about twice.
+
 The card tells you when something other than Jev's own top pick decided the result:
 
 | Card says | Meaning |
@@ -104,7 +108,7 @@ claude plugin test .
 - `hooks/rubric.ts`: the questions Jev is asked.
 - `hooks/route.ts`: the bars, step-up rule and guards.
 - `hooks/jev.ts`: request building, scrubbing and parsing.
-- `hooks/register.tsx`: the button and card.
+- `hooks/register.tsx`: the button, the card, and first-message routing.
 
 If you change the Jev version, retune the bars; they were set on `jev-1.13.0`.
 

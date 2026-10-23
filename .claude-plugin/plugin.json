@@ -1,6 +1,6 @@
 {
   "name": "jev-router",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Suggests a Claude model and effort level for the message you are about to send, scored by the Jev decision model.",
   "author": {
     "name": "Prad Biswas"

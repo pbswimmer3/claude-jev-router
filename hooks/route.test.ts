@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { decide, MODEL_BARS, namedEffort, needsContext, recommend, TIERS } from './route'
+import { decide, MODEL_BARS, namedEffort, needsContext, recommend, routesOnSend, TIERS } from './route'
 
 describe('decide', () => {
   test('keeps a pick that clears its bar', async () => {
@@ -110,5 +110,30 @@ describe('needsContext', () => {
     expect(needsContext(0.33, true)).toBe(false)
     expect(needsContext(0.96, false)).toBe(false)
     expect(needsContext(undefined, true)).toBe(false)
+  })
+})
+
+describe('routesOnSend', () => {
+  const typed = { text: 'fix the flaky test', origin: 'sdk', isCommand: false, isMeta: false }
+  const said = { role: 'user', text: 'hi', isToolResult: false }
+
+  test("routes a new session's first typed message", async () => {
+    expect(routesOnSend(typed, [])).toBe(true)
+    expect(routesOnSend({ ...typed, origin: 'composer' }, [])).toBe(true)
+    expect(routesOnSend({ ...typed, origin: undefined }, [])).toBe(true)
+  })
+
+  test('leaves later messages to the button', async () => {
+    expect(routesOnSend(typed, [said])).toBe(false)
+    expect(routesOnSend(typed, [{ ...said, isToolResult: true }])).toBe(true)
+  })
+
+  test('skips commands, hidden prompts, machine origins and a draft already routed', async () => {
+    expect(routesOnSend({ ...typed, isCommand: true }, [])).toBe(false)
+    expect(routesOnSend({ ...typed, isMeta: true }, [])).toBe(false)
+    expect(routesOnSend({ ...typed, origin: 'task-notification' }, [])).toBe(false)
+    expect(routesOnSend({ ...typed, origin: 'plugin' }, [])).toBe(false)
+    expect(routesOnSend(typed, [], typed.text)).toBe(false)
+    expect(routesOnSend({ ...typed, text: '  ' }, [])).toBe(false)
   })
 })
