@@ -128,3 +128,35 @@ export function recommend(answers: JevAnswers, draft: string): Recommendation {
 
   return { model, effort, reasons, namedModel: named }
 }
+
+// Who sends a prompt the person typed: the terminal, the phone bridge, or the desktop app (an SDK host,
+// which may also leave it unclassified). Notifications, peers, schedules and plugins are never routed.
+export const TYPED_ORIGINS: readonly string[] = ['composer', 'bridge', 'sdk', 'unclassified']
+
+// `origin` is absent where the engine stamped none: the person's own prompt.
+export type Sent = { text: string; origin?: string; isCommand: boolean; isMeta: boolean }
+export type Turn = { role: string; text: string; isToolResult: boolean }
+
+// The desktop app puts its own <system-reminder> blocks in a prompt (a scratch folder's note before
+// the person's words), and a session another one started opens on that session's brief, not on
+// anything the person typed. What is left is what Jev should score; '' when the person typed nothing.
+const REMINDER = /<system-reminder>[\s\S]*?<\/system-reminder>/g
+const BRIEF = 'Background (from the session that started this one)'
+
+export function typedText(text: string): string {
+  const left = text.replace(REMINDER, '').trim()
+
+  return left.startsWith(BRIEF) ? '' : left
+}
+
+// A new session's first typed message, which nothing routed before it was sent.
+export function routesOnSend(sent: Sent, earlier: readonly Turn[], routedDraft?: string): boolean {
+  return (
+    typedText(sent.text) !== '' &&
+    !sent.isCommand &&
+    !sent.isMeta &&
+    (sent.origin === undefined || TYPED_ORIGINS.includes(sent.origin)) &&
+    typedText(sent.text) !== routedDraft &&
+    !earlier.some(t => t.role === 'user' && !t.isToolResult && t.text.trim() !== '')
+  )
+}

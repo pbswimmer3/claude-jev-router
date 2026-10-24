@@ -1,8 +1,8 @@
-import type { Engine, Register } from 'claude-code'
+import type { EngineInterface as Engine, Register } from 'claude-code'
 
 import type { Choice, Effort, Recommendation, RouteStatus, Tier } from '../types'
 import { buildJevRequest, buildState, KEY_NAMES, keyFromEnvFile, parseJevResponse, type JevConfig, type JevRequest } from './jev'
-import { needsContext, recommend } from './route'
+import { needsContext, recommend, routesOnSend, typedText } from './route'
 
 const MODEL_NAMES: Record<Tier, string> = {
   haiku: 'Haiku 5.5',
@@ -93,6 +93,13 @@ async function ask($: Engine, request: JevRequest) {
   return parseJevResponse(response.text)
 }
 
+// "Opus 5.5" for the id the session reports, or the id itself when it names no tier.
+function modelName(id: string): string {
+  const tier = (Object.keys(MODEL_NAMES) as Tier[]).find(t => id.toLowerCase().includes(t))
+
+  return tier === undefined ? id : MODEL_NAMES[tier]
+}
+
 async function route($: Engine, config: Omit<JevConfig, 'apiKey'>, keyFile: string) {
   const { text: draft } = await $.prompt.read()
 
@@ -102,6 +109,13 @@ async function route($: Engine, config: Omit<JevConfig, 'apiKey'>, keyFile: stri
     return
   }
 
+  await score($, config, keyFile, draft)
+}
+
+// Asks Jev about one draft and puts the card up. `sentOn` is set for a new session's first
+// message, which is already running on that model: the desktop's New session screen runs no
+// mod, so that message is routed as it is sent rather than before.
+async function score($: Engine, config: Omit<JevConfig, 'apiKey'>, keyFile: string, draft: string, sentOn?: string) {
   await setStatus($, { kind: 'routing' })
 
   try {
@@ -111,14 +125,20 @@ async function route($: Engine, config: Omit<JevConfig, 'apiKey'>, keyFile: stri
       throw new Error(`no ${KEY_NAMES.join(' or ')} in the environment or in ${keyFile}`)
     }
 
-    const messages = await $.session.messages()
+    const messages = sentOn === undefined ? await $.session.messages() : []
     const turns = messages.map(m => ({ role: m.role, text: m.text, isToolResult: (m.toolResults?.length ?? 0) > 0 }))
     const alone = await ask($, buildJevRequest({ ...config, apiKey }, buildState(draft, []), true))
     const withContext = needsContext(alone.continues, turns.some(t => !t.isToolResult && t.text.trim() !== ''))
     const answers = withContext ? await ask($, buildJevRequest({ ...config, apiKey }, buildState(draft, turns))) : alone
     const rec = recommend(answers, draft)
     const at = await $.clock.now()
-    await setStatus($, { kind: 'ready', rec, draft })
+
+    // A message sent while Jev was answering cleared the card; don't put a stale one back.
+    if ((await getStatus($)).kind !== 'routing') {
+      return
+    }
+
+    await setStatus($, { kind: 'ready', rec, draft, ...(sentOn === undefined ? {} : { sentOn }) })
     await log($, entries => [
       ...entries,
       {
@@ -130,6 +150,7 @@ async function route($: Engine, config: Omit<JevConfig, 'apiKey'>, keyFile: stri
         effortConfidence: rec.effort.confidence,
         jevModel: answers.jevModel,
         usedContext: withContext,
+        ...(sentOn === undefined ? {} : { sentOn }),
       },
     ])
   } catch (error) {
@@ -146,14 +167,23 @@ export const register: Register = (on, options) => {
 
   on('prompt.submit', async ($, e, next) => {
     const sentOn = await $.session.model()
+    const before = await getStatus($)
+    const earlier = (await $.session.messages()).map(m => ({ role: m.role, text: m.text, isToolResult: (m.toolResults?.length ?? 0) > 0 }))
+    const sent = { text: e.text, origin: e.origin?.kind, isCommand: e.command !== undefined, isMeta: e.isMeta === true }
+    const isFirst = routesOnSend(sent, earlier, before.kind === 'ready' ? before.draft : undefined)
     await log($, entries => {
       const last = entries.at(-1)
 
       return last && last.sentOn === undefined ? [...entries.slice(0, -1), { ...last, sentOn }] : entries
     })
     await setStatus($, IDLE)
+    const result = await next(e)
 
-    return next(e)
+    if (isFirst && result.drop === undefined) {
+      void score($, config, keyFile, typedText(e.text), sentOn)
+    }
+
+    return result
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
@@ -193,14 +223,21 @@ export const register: Register = (on, options) => {
       )
     }
 
-    const { rec } = current
+    const { rec, sentOn } = current
+    const suggested = MODEL_NAMES[rec.model.value]
+    const hint =
+      sentOn === undefined
+        ? 'Set it in the model picker before you send. '
+        : modelName(sentOn) === suggested
+          ? `Your first message is on ${suggested} already; check the effort in the picker. `
+          : `Your first message is running on ${modelName(sentOn)}. Switch in the picker for the next one, or stop and resend. `
 
     return (
       <Box flexDirection="column">
         <Text>
           <Text dimColor>Jev suggests </Text>
           <Text bold>
-            {MODEL_NAMES[rec.model.value]} · {rec.effort.value[0].toUpperCase() + rec.effort.value.slice(1)} effort
+            {suggested} · {rec.effort.value.charAt(0).toUpperCase() + rec.effort.value.slice(1)} effort
           </Text>
           <Text dimColor>
             {'  '}
@@ -208,7 +245,7 @@ export const register: Register = (on, options) => {
           </Text>
         </Text>
         <Box>
-          <Text dimColor>Set it in the model picker before you send. </Text>
+          <Text dimColor>{hint}</Text>
           <Button key="dismiss" label="Dismiss" hotkey="d" onPress={() => setStatus($, IDLE)} />
         </Box>
       </Box>
