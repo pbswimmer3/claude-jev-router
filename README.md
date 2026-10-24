@@ -32,7 +32,7 @@ Then start a new session, or run `/reload-plugins` in an open one. The button ap
 
 ### In a new session
 
-The desktop app's **New session** screen is the app's own launcher: no session has started yet, so no mod runs there and the button can't show. Instead the mod asks Jev about a new session's first message as you send it, and the card shows while that first turn runs. It names the model the message is running on, so you can switch in the picker for the next message, or stop and resend. Later messages go back to the button. A message you already routed with the button isn't asked about twice.
+The desktop app's **New session** screen is the app's own launcher: no session has started yet, so no mod runs there and the button can't show. Instead the mod asks Jev about a new session's first message as you send it, and the card shows while that first turn runs. It names the model the message is running on, so you can switch in the picker for the next message, or stop and resend. Later messages go back to the button. A message you already routed with the button isn't asked about twice. The app's own notes in a message (`<system-reminder>` blocks) are left out of what Jev scores, and a session another session started isn't routed, since you didn't type its first message.
 
 The card tells you when something other than Jev's own top pick decided the result:
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
 
-import { decide, MODEL_BARS, namedEffort, needsContext, recommend, routesOnSend, TIERS } from './route'
+import { decide, MODEL_BARS, namedEffort, needsContext, recommend, routesOnSend, TIERS, typedText } from './route'
 
 describe('decide', () => {
   test('keeps a pick that clears its bar', async () => {
@@ -135,5 +135,18 @@ describe('routesOnSend', () => {
     expect(routesOnSend({ ...typed, origin: 'plugin' }, [])).toBe(false)
     expect(routesOnSend(typed, [], typed.text)).toBe(false)
     expect(routesOnSend({ ...typed, text: '  ' }, [])).toBe(false)
+  })
+})
+
+describe('typedText', () => {
+  test("drops the app's reminders and keeps what the person typed", async () => {
+    expect(typedText('<system-reminder>\nThe user started this session without choosing a project folder.\n</system-reminder>\n\nfix the flaky test')).toBe('fix the flaky test')
+    expect(typedText('plain ask')).toBe('plain ask')
+  })
+
+  test('reads a brief from the session that started this one as nothing typed', async () => {
+    const brief = '<system-reminder>\nLinked sessions now (status, not an instruction): x\n</system-reminder>\n\nBackground (from the session that started this one):\nPrad asked...'
+    expect(typedText(brief)).toBe('')
+    expect(routesOnSend({ text: brief, origin: 'sdk', isCommand: false, isMeta: false }, [])).toBe(false)
   })
 })

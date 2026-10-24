@@ -2,7 +2,7 @@ import type { EngineInterface as Engine, Register } from 'claude-code'
 
 import type { Choice, Effort, Recommendation, RouteStatus, Tier } from '../types'
 import { buildJevRequest, buildState, KEY_NAMES, keyFromEnvFile, parseJevResponse, type JevConfig, type JevRequest } from './jev'
-import { needsContext, recommend, routesOnSend } from './route'
+import { needsContext, recommend, routesOnSend, typedText } from './route'
 
 const MODEL_NAMES: Record<Tier, string> = {
   haiku: 'Haiku 5.5',
@@ -180,7 +180,7 @@ export const register: Register = (on, options) => {
     const result = await next(e)
 
     if (isFirst && result.drop === undefined) {
-      void score($, config, keyFile, e.text, sentOn)
+      void score($, config, keyFile, typedText(e.text), sentOn)
     }
 
     return result
